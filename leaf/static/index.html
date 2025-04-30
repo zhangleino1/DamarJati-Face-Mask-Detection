@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>茶叶疾病智能诊断系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <!-- 页面顶部 -->
+        <div class="header-container">
+            <div class="container">
+                <h1 class="text-center py-4">
+                    <i class="bi bi-tree-fill text-success me-2"></i>茶叶疾病智能诊断系统
+                </h1>
+            </div>
+        </div>
+        
+        <div class="container my-4">
+            <div class="row">
+                <!-- 左侧上传区域 -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-upload me-2"></i>上传茶叶图片</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="upload-form">
+                                <div class="upload-area text-center p-5 mb-3" id="dropzone">
+                                    <div id="upload-icon">
+                                        <i class="bi bi-cloud-arrow-up display-4 text-success"></i>
+                                        <p class="mt-2">点击此处上传文件或拖放文件到这里</p>
+                                        <p class="text-muted small">支持的格式: JPG, PNG</p>
+                                    </div>
+                                    <div id="preview-container" class="d-none">
+                                        <img id="preview-image" class="img-fluid rounded" src="#" alt="预览图">
+                                    </div>
+                                    <input type="file" id="file-input" accept="image/*" class="d-none">
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-success" id="analyze-btn" disabled>
+                                        <i class="bi bi-search me-2"></i>分析图片
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="reset-btn">
+                                        <i class="bi bi-arrow-counterclockwise me-2"></i>重置
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧结果区域 -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-clipboard-data me-2"></i>诊断结果</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="loading" class="text-center d-none">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="visually-hidden">加载中...</span>
+                                </div>
+                                <p class="mt-2">正在分析图片，请稍候...</p>
+                            </div>
+                            
+                            <div id="result-container" class="d-none">
+                                <div class="alert alert-success mb-4">
+                                    <h5 class="alert-heading">诊断结果</h5>
+                                    <p>检测到的茶叶状态: <strong id="prediction-result"></strong></p>
+                                    <p>置信度: <strong id="prediction-confidence"></strong></p>
+                                </div>
+                                
+                                <h6>所有可能的疾病类型概率:</h6>
+                                <div id="probabilities-container"></div>
+                            </div>
+                            
+                            <div id="placeholder" class="text-center py-5 text-muted">
+                                <i class="bi bi-card-list display-4"></i>
+                                <p class="mt-3">请上传茶叶图片以获取诊断结果</p>
+                            </div>
+                            
+                            <div id="error-container" class="alert alert-danger d-none">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <span id="error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部信息区域 -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>茶叶疾病知识库</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="accordion" id="diseaseAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                            茶藻斑病 (Tea algal leaf spot)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#diseaseAccordion">
+                                        <div class="accordion-body">
+                                            <p>茶藻斑病是由藻类引起的常见茶叶疾病，主要表现为叶片上出现圆形或不规则的褐色斑点。高湿环境下发病率较高，可通过适当通风和控制湿度进行预防。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                            茶褐斑病 (Brown Blight)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#diseaseAccordion">
+                                        <div class="accordion-body">
+                                            <p>茶褐斑病是由真菌引起的严重茶叶病害，主要症状为叶片上出现褐色斑点，严重时斑点扩大连成片，导致叶片枯萎脱落。应及时喷洒杀菌剂防治。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                            茶灰斑病 (Gray Blight)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#diseaseAccordion">
+                                        <div class="accordion-body">
+                                            <p>茶灰斑病主要表现为叶片出现灰色至灰褐色的不规则斑点，边缘常有水渍状暗绿色晕圈。高温高湿环境有利于此病发生，应注意改善通风条件。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                                            茶黑刺蝽 (Helopeltis)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#diseaseAccordion">
+                                        <div class="accordion-body">
+                                            <p>茶黑刺蝽是一种常见的茶树害虫，成虫和若虫均以刺吸茶树嫩梢、嫩叶汁液为生，导致叶片出现褐色斑点，影响茶叶品质。可通过喷洒生物农药或化学农药进行防治。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                                            茶红蜘蛛 (Red spider)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#diseaseAccordion">
+                                        <div class="accordion-body">
+                                            <p>茶红蜘蛛是危害茶树的主要害虫之一，主要危害叶片，导致叶片失绿、变黄、干枯，严重影响茶树生长和产量。可通过释放天敌或喷洒杀虫剂进行防治。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix">
+                                            茶绿盲蝽 (Green mirid bug)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#diseaseAccordion">
+                                        <div class="accordion-body">
+                                            <p>茶绿盲蝽是一种常见的茶树害虫，以刺吸茶树嫩芽、嫩叶和幼茎的汁液为生，受害部位出现褐色小点，严重时叶片变形。可通过物理防治和化学防治相结合的方法进行控制。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven">
+                                            健康茶叶 (Healthy leaf)
+                                        </button>
+                                    </h2>
+                                    <div id="collapseSeven" class="accordion-collapse collapse" data-bs-parent="#diseaseAccordion">
+                                        <div class="accordion-body">
+                                            <p>健康的茶叶呈深绿色，叶片完整无破损，表面光滑有光泽，无病斑、虫害和其他异常现象。保持茶树健康的关键是合理的养护管理，包括适当的施肥、浇水和修剪。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 页脚 -->
+        <footer class="footer mt-auto py-3 bg-dark text-white">
+            <div class="container text-center">
+                <span>© 2023 茶叶疾病智能诊断系统 | 基于深度学习的茶叶疾病识别</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
