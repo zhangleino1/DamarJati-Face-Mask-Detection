@@ -29,6 +29,8 @@
                         </div>
                         <div class="card-body">
                             <form id="upload-form">
+                                <!-- 将文件输入移到上传区域外部 -->
+                                <input type="file" id="file-input" accept="image/*" class="d-none">
                                 <div class="upload-area text-center p-5 mb-3" id="dropzone">
                                     <div id="upload-icon">
                                         <i class="bi bi-cloud-arrow-up display-4 text-success"></i>
@@ -38,7 +40,6 @@
                                     <div id="preview-container" class="d-none">
                                         <img id="preview-image" class="img-fluid rounded" src="#" alt="预览图">
                                     </div>
-                                    <input type="file" id="file-input" accept="image/*" class="d-none">
                                 </div>
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-success" id="analyze-btn" disabled>

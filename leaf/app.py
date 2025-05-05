@@ -2,6 +2,7 @@ import os
 import io
 import torch
 import torchvision.transforms as transforms
+from torchvision.models import swin_t, Swin_T_Weights
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -45,20 +46,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 创建模型类
-class TeaLeafModel(nn.Module):
-    def __init__(self, num_classes=7):
-        super(TeaLeafModel, self).__init__()
-        self.model = swin_t(weights=None)
-        self.model.head = nn.Linear(self.model.head.in_features, num_classes)
-        
-    def forward(self, x):
-        return self.model(x)
+# 创建模型类# Replace your TeaLeafModel class with this:
+def create_model(num_classes=7):
+    # Match the exact same structure as in train.py
+    model = swin_t(weights=Swin_T_Weights.IMAGENET1K_V1)
+    num_features = model.head.in_features
+    model.head = nn.Linear(num_features, num_classes)
+    return model
 
-# 加载模型
+# Then update the load_model function
 def load_model():
-    model = TeaLeafModel(num_classes=7)
-    model_path = os.path.join(os.getcwd(),'leaf', 'best_model.pth')
+    model = create_model(num_classes=7)
+    model_path = os.path.join(os.getcwd(), 'best_model.pth')
     
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"模型文件 {model_path} 不存在")
@@ -67,6 +66,8 @@ def load_model():
     model.to(DEVICE)
     model.eval()
     return model
+
+
 
 # 预测函数
 def predict_image(model, image_bytes):
@@ -125,8 +126,8 @@ async def startup_event():
     except Exception as e:
         print(f"模型加载失败: {str(e)}")
 
-@app.post("/predict/")
-async def predict(file: UploadFile = File(...)):
+@app.post("/predict")  # Changed from "/predict/" to "/predict"
+async def predict(file: UploadFile = File(...)):  # Parameter name is "file" to match API
     global model
     if model is None:
         raise HTTPException(status_code=500, detail="模型未加载")
