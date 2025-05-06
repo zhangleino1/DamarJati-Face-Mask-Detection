@@ -83,17 +83,18 @@ def predict_image(model, image_bytes):
         # 获取预测结果
         idx_to_class = {
             0: "Tea algal leaf spot",
-            1: "Brown Blight",
-            2: "Gray Blight",
-            3: "Helopeltis",
-            4: "Red spider", 
-            5: "Green mirid bug",
-            6: "Healthy leaf"
+            1: "Red spider",
+            2: "Green mirid bug",
+            3: "Brown Blight",
+            4: "Gray Blight",
+            5: "Healthy leaf",
+            6: "Helopeltis"
         }
         
         predicted_class = idx_to_class[predicted_idx.item()]
         chinese_class = disease_names[predicted_class]
         probability = probabilities[0][predicted_idx].item()
+        print(f"预测类别: {predicted_class}, 概率: {probability:.4f}")
         
         # 获取所有类别的概率
         all_probs = {}
